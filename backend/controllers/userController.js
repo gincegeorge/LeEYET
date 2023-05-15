@@ -5,7 +5,10 @@ import { singUpInteractor } from "../interactor/singUpInteractor.js";
 const signUp = async (req, res) => {
     const { name, email, password } = req.body
 
-    const userData = await singUpInteractor(name, email, password)
+    let address = " "
+    let profileImg = " "
+
+    const userData = await singUpInteractor(name, email, password, address, profileImg)
 
     if (userData.status) {
         res.status(201).json({ token: userData?.token, created: true })
@@ -38,4 +41,8 @@ const getUserData = async (req, res) => {
     }
 }
 
-export { signUp, login, getUserData }
+const updateProfile = async (req, res) => {
+    console.log(req.files);
+}
+
+export { signUp, login, getUserData, updateProfile }

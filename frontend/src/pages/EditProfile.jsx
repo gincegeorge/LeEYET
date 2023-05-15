@@ -1,64 +1,79 @@
 import { Link } from "react-router-dom";
-import { useFormik } from "formik";
-import { signUpSchema } from "../schemas";
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import Cookies from "universal-cookie";
-// import { useDispatch } from "react-redux";
-// import { checkCookie } from "../../utils/userSlice";
-
-let userData = {
-  name: "David John",
-  email: "saju@mail.com",
-  password: "123456",
-  profileImg: "/img/profile.webp",
-};
-
-const initialValues = {
-  name: "",
-  email: "",
-  password: "",
-};
+import Cookies from "universal-cookie";
+// import { useDispatch, useSelector } from "react-redux";
+// import { addUserInfo, checkCookie } from "../utils/userSlice";
+import { getUserInfo } from "../utils/getUserInfo";
+import axios from "axios";
 
 function EditProfile() {
-  //   const dispatch = useDispatch();
-  const [showPass, setShowPass] = useState(false);
+  const [image, setImage] = useState("");
   const Navigate = useNavigate();
-  //   const cookies = new Cookies();
+  const cookies = new Cookies();
+  // const dispatch = useDispatch();
+  // const userInfo = useSelector((store) => store.user);
+  const [userData, setUserData] = useState({});
 
-  const { values, errors, handleBlur, touched, handleChange, handleSubmit } =
-    useFormik({
-      initialValues,
-      validationSchema: signUpSchema,
-      onSubmit: async (values, action) => {
-        try {
-          const { data } = await axios.post(
-            import.meta.env.VITE_BACKEND_URL + "user/signup",
-            {
-              ...values,
-            },
-            {
-              withCredentials: true,
-            }
-          );
+  useEffect(() => {
+    const cookie = cookies.get("jwt-user");
 
-          if (data.created === true) {
-            if (data?.token) {
-              //   cookies.set("jwt-user", data.token, { path: "/" });
-            }
-            action.resetForm();
-            // dispatch(checkCookie(true));
-            Navigate("/user/dashboard");
-          }
-        } catch (err) {
-          if (err.response.data.error.email) {
-            errors.email = err.response.data.error.email;
-          }
-          console.log(err.response.data);
-        }
-      },
-    });
+    (async function () {
+      let data = await getUserInfo(cookie);
+
+      if (data?.userFound) {
+        console.log("user found", data?.user);
+
+        setUserData({
+          name: data?.user?.name,
+          email: data?.user?.email,
+          // profileImg: data?.user?.profileImg,
+          address: data?.user?.address,
+        });
+
+        setImage(data?.user?.profileImg);
+
+        // dispatch(checkCookie(true));
+        // dispatch(
+        //   addUserInfo({
+        //     name: data?.user?.name,
+        //     email: data?.user?.email,
+        //     profileImg: data?.user?.profileImg,
+        //     address: data?.user?.address,
+        //   })
+        // );
+      } else {
+        cookies.remove("jwt-user");
+        // dispatch(checkCookie(false));
+        Navigate("/signin");
+      }
+    })();
+  }, []);
+
+  console.log(userData, image);
+
+  const handleImage = (e) => {
+    console.log(e.target.files[0]);
+    setImage(e.target.files[0]);
+  };
+
+  const submitHandeler = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+
+    formData.append("profileimage", image);
+    formData.append("user", "userData");
+
+    console.log(formData.get("profileimage"));
+
+    const { data } = await axios.post(
+      import.meta.env.VITE_BACKEND_URL + "update",
+      formData
+    );
+
+    console.log(data);
+  };
 
   return (
     <section className="bg-gray-50 ">
@@ -70,7 +85,7 @@ function EditProfile() {
             </h1>
             <div className="flex flex-row ">
               <img
-                src={userData.profileImg}
+                src=""
                 alt=""
                 className="w-14 h-14 mr-5 rounded-full aspect-square"
               />
@@ -78,7 +93,24 @@ function EditProfile() {
                 <span className="inline-block pt-4">change profile photo</span>
               </span>
             </div>
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+            <form
+              encType="multipart/form-data"
+              className="space-y-4 md:space-y-6"
+              onSubmit={submitHandeler}
+            >
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900">
+                  change image
+                </label>
+                <input
+                  type="file"
+                  name="file"
+                  id="file"
+                  accept="image/*"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  onChange={handleImage}
+                />
+              </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">
                   Your name
@@ -89,13 +121,14 @@ function EditProfile() {
                   id="name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                   placeholder="Your name"
-                  value={values.name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
+                  value={userData?.name}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
                 />
-                {errors.name && touched.name ? (
-                  <p className="text-red-500 mt-1 text-sm"> {errors.name}</p>
-                ) : null}
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -107,13 +140,14 @@ function EditProfile() {
                   id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                   placeholder="Your email"
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
+                  value={userData?.email}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
                 />
-                {errors.email && touched.email ? (
-                  <p className="text-red-500 mt-1 text-sm"> {errors.email}</p>
-                ) : null}
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -125,74 +159,16 @@ function EditProfile() {
                   id="address"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                   placeholder="Your name"
-                  value={values?.address}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
+                  value={userData?.address}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
                 />
-                {errors.address && touched?.address ? (
-                  <p className="text-red-500 mt-1 text-sm">
-                    {" "}
-                    {errors?.address}
-                  </p>
-                ) : null}
               </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900">
-                  {/* TODO - old password */}
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPass ? "text" : "password"}
-                    name="password"
-                    id="password"
-                    placeholder="••••••••"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                  />
-                  {values.password.length > 0 && (
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 showPass">
-                      {showPass ? (
-                        <svg
-                          onClick={() => setShowPass(false)}
-                          className="h-6 text-gray-700"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 640 512"
-                          style={{ cursor: "pointer" }}
-                        >
-                          <path
-                            fill="#6e7e92"
-                            d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          onClick={() => setShowPass(true)}
-                          className="h-6 text-gray-700 show"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 576 512"
-                          style={{ cursor: "pointer" }}
-                        >
-                          <path
-                            fill="#6e7e92"
-                            d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z"
-                          ></path>
-                        </svg>
-                      )}
-                    </div>
-                  )}
-                </div>
-                {errors.password && touched.password ? (
-                  <p className="text-red-500 mt-1 text-sm">
-                    {" "}
-                    {errors.password}
-                  </p>
-                ) : null}
-              </div>
+
               <div className="flex flex-row">
                 <button
                   type="submit"
