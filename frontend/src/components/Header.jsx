@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 // import Cookies from "universal-cookie";
 
 const Header = () => {
-//   const cookies = new Cookies();
-//   const dispatch = useDispatch();
-//   const isLoggedIn = useSelector((store) => store.user.isLoggedIn);
+  //   const cookies = new Cookies();
+  //   const dispatch = useDispatch();
+  //   const isLoggedIn = useSelector((store) => store.user.isLoggedIn);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-//   const Navigate = useNavigate();
+  //   const Navigate = useNavigate();
 
   const handleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -39,11 +39,11 @@ const Header = () => {
     // }
   };
 
-  const isLoggedIn = false
+  const isLoggedIn = false;
 
   return (
     <header>
-      <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
+      <nav className="bg-slate-100 border-gray-200 px-4 lg:px-6 py-5">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
           <Link to="/" className="flex items-center">
             <img
@@ -52,7 +52,7 @@ const Header = () => {
               alt="Flowbite Logo"
             />
             <span className="self-center text-xl font-semibold whitespace-nowrap ">
-              FindTalent
+              LeEYE
             </span>
           </Link>
           <div className="flex items-center lg:order-2">
@@ -66,7 +66,7 @@ const Header = () => {
             ) : (
               <>
                 <Link
-                  to="/account-access"
+                  to="/signin"
                   className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
                 >
                   Sign in
@@ -125,6 +125,15 @@ const Header = () => {
                   aria-current="page"
                 >
                   Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/dashboard"
+                  className="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0"
+                  aria-current="page"
+                >
+                  Dashboard
                 </Link>
               </li>
             </ul>

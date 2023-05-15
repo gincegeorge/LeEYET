@@ -8,13 +8,20 @@ import { useNavigate } from "react-router-dom";
 // import { useDispatch } from "react-redux";
 // import { checkCookie } from "../../utils/userSlice";
 
+let userData = {
+  name: "David John",
+  email: "saju@mail.com",
+  password: "123456",
+  profileImg: "/img/profile.webp",
+};
+
 const initialValues = {
   name: "",
   email: "",
   password: "",
 };
 
-function Signup() {
+function EditProfile() {
   //   const dispatch = useDispatch();
   const [showPass, setShowPass] = useState(false);
   const Navigate = useNavigate();
@@ -55,13 +62,22 @@ function Signup() {
 
   return (
     <section className="bg-gray-50 ">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <div className="flex flex-col items-center justify-center px-6 py-16 mx-auto">
         <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-              Create your freelancer account
+              Edit profile
             </h1>
-
+            <div className="flex flex-row ">
+              <img
+                src={userData.profileImg}
+                alt=""
+                className="w-14 h-14 mr-5 rounded-full aspect-square"
+              />
+              <span className="">
+                <span className="inline-block pt-4">change profile photo</span>
+              </span>
+            </div>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -72,7 +88,7 @@ function Signup() {
                   name="name"
                   id="name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  placeholder="John Cena"
+                  placeholder="Your name"
                   value={values.name}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -90,7 +106,7 @@ function Signup() {
                   name="email"
                   id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                  placeholder="name@company.com"
+                  placeholder="Your email"
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -101,6 +117,28 @@ function Signup() {
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900">
+                  Address
+                </label>
+                <textarea
+                  type="textarea"
+                  name="address"
+                  id="address"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                  placeholder="Your name"
+                  value={values?.address}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {errors.address && touched?.address ? (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {" "}
+                    {errors?.address}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900">
+                  {/* TODO - old password */}
                   Password
                 </label>
                 <div className="relative">
@@ -155,21 +193,20 @@ function Signup() {
                   </p>
                 ) : null}
               </div>
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-              >
-                Create an account
-              </button>
-              <p className="text-sm font-light text-gray-500">
-                Already have an account?{" "}
-                <Link
-                  to="/user/login"
-                  className="font-medium text-primary-600 hover:underline"
+              <div className="flex flex-row">
+                <button
+                  type="submit"
+                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                 >
-                  Login here
+                  Save changes
+                </button>
+                <Link
+                  to="/dashboard"
+                  className="w-full border border-slate-300 ml-2 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                >
+                  Cancel
                 </Link>
-              </p>
+              </div>
             </form>
           </div>
         </div>
@@ -178,4 +215,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default EditProfile;
