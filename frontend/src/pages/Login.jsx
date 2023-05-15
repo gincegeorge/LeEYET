@@ -4,8 +4,8 @@ import { useFormik } from "formik";
 import { loginSchema } from "../schemas";
 import Cookies from "universal-cookie";
 import axios from "axios";
-// import { checkCookie } from "../../utils/userSlice";
-// import { useDispatch } from "react-redux";
+import { checkCookie } from "../utils/userSlice.js";
+import { useDispatch } from "react-redux";
 
 const initialValues = {
   email: "",
@@ -13,7 +13,7 @@ const initialValues = {
 };
 
 function Login() {
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [showPass, setShowPass] = useState(false);
   const cookies = new Cookies();
   const Navigate = useNavigate();
@@ -24,10 +24,9 @@ function Login() {
       validationSchema: loginSchema,
       onSubmit: async (values, action) => {
         console.log(values);
-
         try {
           const { data } = await axios.post(
-            import.meta.env.VITE_BACKEND_URL + "user/login",
+            import.meta.env.VITE_BACKEND_URL + "login",
             {
               ...values,
             },
@@ -36,16 +35,20 @@ function Login() {
             }
           );
 
+          console.log('data',data);
+
           if (data.created) {
             if (data.token) {
               cookies.set("jwt-user", data.token, { path: "/" });
               action.resetForm();
-              //   dispatch(checkCookie(true));
-              Navigate("/user/dashboard");
+              dispatch(checkCookie(true));
+              Navigate("/dashboard");
             }
           }
         } catch (err) {
           const error = err.response.data.error;
+          console.log(err);
+
           if (error.email) {
             errors.email = error.email;
           } else if (error.password) {

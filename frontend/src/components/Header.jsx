@@ -1,45 +1,37 @@
 import { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-// import { checkCookie } from "../../utils/userSlice";
-// import Cookies from "universal-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+import { checkCookie } from "../utils/userSlice";
 
 const Header = () => {
-  //   const cookies = new Cookies();
-  //   const dispatch = useDispatch();
-  //   const isLoggedIn = useSelector((store) => store.user.isLoggedIn);
+  const cookies = new Cookies();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((store) => store.user.isLoggedIn);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  //   const Navigate = useNavigate();
+  const Navigate = useNavigate();
 
   const handleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
   useEffect(() => {
-    // const userCookie = cookies.get("jwt-user");
-    // const bizUserCookie = cookies.get("jwt-bizUser");
-    // if (userCookie || bizUserCookie) {
-    //   dispatch(checkCookie(true));
-    // } else {
-    //   dispatch(checkCookie(false));
-    // }
+    const userCookie = cookies.get("jwt-user");
+    if (userCookie) {
+      dispatch(checkCookie(true));
+    } else {
+      dispatch(checkCookie(false));
+    }
   });
 
   const logOut = () => {
-    // const userCookie = cookies.get("jwt-user");
-    // const bizUserCookie = cookies.get("jwt-bizUser");
-    // if (userCookie) {
-    //   cookies.remove("jwt-user", { path: "/" });
-    //   dispatch(checkCookie(false));
-    //   Navigate("/account-access");
-    // } else if (bizUserCookie) {
-    //   cookies.remove("jwt-bizUser", { path: "/" });
-    //   dispatch(checkCookie(false));
-    //   Navigate("/account-access");
-    // }
+    const userCookie = cookies.get("jwt-user");
+    if (userCookie) {
+      cookies.remove("jwt-user");
+      dispatch(checkCookie(false));
+      Navigate("/signin");
+    }
   };
-
-  const isLoggedIn = false;
 
   return (
     <header>

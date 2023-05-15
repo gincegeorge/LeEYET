@@ -8,17 +8,19 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import EditProfile from "./pages/EditProfile";
+import { Provider } from "react-redux";
+import store from "./utils/store";
 
 function App() {
   //app layout
   const AppLayout = () => {
     return (
       <>
-        {/* <Provider store={store}> */}
+        <Provider store={store}>
         <Header />
         <Outlet />
         <Footer />
-        {/* </Provider> */}
+        </Provider>
       </>
     );
   };

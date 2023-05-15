@@ -4,9 +4,9 @@ import { signUpSchema } from "../schemas";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import Cookies from "universal-cookie";
-// import { useDispatch } from "react-redux";
-// import { checkCookie } from "../../utils/userSlice";
+import Cookies from "universal-cookie";
+import { useDispatch } from "react-redux";
+import { checkCookie } from "../utils/userSlice";
 
 const initialValues = {
   name: "",
@@ -15,10 +15,10 @@ const initialValues = {
 };
 
 function Signup() {
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [showPass, setShowPass] = useState(false);
   const Navigate = useNavigate();
-  //   const cookies = new Cookies();
+  const cookies = new Cookies();
 
   const { values, errors, handleBlur, touched, handleChange, handleSubmit } =
     useFormik({
@@ -27,7 +27,7 @@ function Signup() {
       onSubmit: async (values, action) => {
         try {
           const { data } = await axios.post(
-            import.meta.env.VITE_BACKEND_URL + "user/signup",
+            import.meta.env.VITE_BACKEND_URL + "signup",
             {
               ...values,
             },
@@ -36,13 +36,15 @@ function Signup() {
             }
           );
 
+          console.log(data);
+
           if (data.created === true) {
             if (data?.token) {
-              //   cookies.set("jwt-user", data.token, { path: "/" });
+              cookies.set("jwt-user", data.token, { path: "/" });
             }
             action.resetForm();
-            // dispatch(checkCookie(true));
-            Navigate("/user/dashboard");
+            dispatch(checkCookie(true));
+            Navigate("/dashboard");
           }
         } catch (err) {
           if (err.response.data.error.email) {

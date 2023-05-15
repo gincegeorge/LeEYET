@@ -1,11 +1,49 @@
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import axios from "axios";
+import Cookies from "universal-cookie";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { checkCookie } from "../utils/userSlice";
+
+let userData = {
+  name: "David John",
+  email: "saju@mail.com",
+  password: "123456",
+  profileImg: "/img/placeholder-profile-pic.png",
+};
+
 function Dashboard() {
-  let userData = {
-    name: "David John",
-    email: "saju@mail.com",
-    password: "123456",
-    profileImg: "/img/profile.webp",
-  };
+  const cookies = new Cookies();
+  const dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const isLoggedIn = useSelector((store) => store.user.isLoggedIn);
+
+  if (isLoggedIn === false) {
+    Navigate("/signin");
+  }
+  useEffect(() => {
+    const cookie = cookies.get("jwt-user");
+
+    (async function verifyUser() {
+      try {
+        const { data } = await axios.post(
+          import.meta.env.VITE_BACKEND_URL + "user-data",
+          { cookie: cookie }
+        );
+        if (data.userFound) {
+          console.log("user found", data.user);
+          dispatch(checkCookie(true));
+        }
+      } catch (error) {
+        console.log("you have an error: ", error.message);
+        cookies.remove("jwt-user");
+        dispatch(checkCookie(false));
+        Navigate("/signin");
+      }
+    })();
+  }, []);
 
   return (
     <section className="bg-white my-20 justify-center flex">

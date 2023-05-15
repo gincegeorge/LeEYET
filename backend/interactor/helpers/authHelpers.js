@@ -22,7 +22,6 @@ const hashPassword = async (text) => {
     }
 }
 
-
 const comparePassword = async (Enteredpassword, dbPassword) => {
     const validPassword = await Bcrypt.compare(Enteredpassword, dbPassword)
     if (validPassword) {
@@ -32,34 +31,18 @@ const comparePassword = async (Enteredpassword, dbPassword) => {
     }
 }
 
-/**
- * @param {string} jwtToken
- * @returns {boolean} 
- */
-const verifyJWT = async (token) => {
+const validateToken = (token) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        try {
-            const userData = await user.findOne({ _id: decoded.id })
-            if (userData) {
-                return true
-            } else {
-                throw new Error(`Could not find user`)
-            }
-        } catch (error) {
-            log(error)
-            return false
-        }
+        return jwt.verify(token, process.env.JWT_SECRET_KEY)
     } catch (error) {
-        console.log(error);
         return false
     }
 }
-
 
 export {
     createToken,
     hashPassword,
     comparePassword,
-    verifyJWT
+    // verifyJWT,
+    validateToken
 }

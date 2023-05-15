@@ -1,3 +1,5 @@
+import { getUserInteractor } from "../interactor/getUserInteractor.js";
+import { loginInteractor } from "../interactor/loginInteractor.js";
 import { singUpInteractor } from "../interactor/singUpInteractor.js";
 
 const signUp = async (req, res) => {
@@ -5,18 +7,35 @@ const signUp = async (req, res) => {
 
     const userData = await singUpInteractor(name, email, password)
 
-    console.log(userData);
-
     if (userData.status) {
-        res.cookie('jwt-user', userData?.token, {
-            withCrdentials: true,
-            httpOnly: false,
-            maxAge: 24 * 60 * 60 * 1000
-        })
-        res.status(201).json({ created: true })
+        res.status(201).json({ token: userData?.token, created: true })
     } else {
-        console.log(userData);
         res.status(409).json({ created: false, error: userData.error })
     }
 }
-export { signUp }
+
+const login = async (req, res) => {
+    const { email, password } = req.body
+
+    const userData = await loginInteractor(email, password)
+
+    console.log(userData);
+
+    if (userData?.created) {
+        res.status(201).json(userData)
+    } else {
+        res.status(409).json(userData)
+    }
+}
+
+const getUserData = async (req, res) => {
+    const cookie = req.body.cookie
+    const user = await getUserInteractor(cookie)
+    if (user) {
+        res.status(201).json({ userFound: true, user })
+    } else {
+        res.status(409).json({ userFound: false })
+    }
+}
+
+export { signUp, login, getUserData }
