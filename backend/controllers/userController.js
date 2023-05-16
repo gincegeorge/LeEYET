@@ -1,12 +1,14 @@
 import { getUserInteractor } from "../interactor/getUserInteractor.js";
 import { loginInteractor } from "../interactor/loginInteractor.js";
 import { singUpInteractor } from "../interactor/singUpInteractor.js";
+import { updateProfileImgInteractor } from "../interactor/updateProfileImgInteractor.js";
+import { updateProfileInteractor } from "../interactor/updateProfileInteractor.js";
 
 const signUp = async (req, res) => {
     const { name, email, password } = req.body
 
-    let address = " "
-    let profileImg = " "
+    let address = ""
+    let profileImg = ""
 
     const userData = await singUpInteractor(name, email, password, address, profileImg)
 
@@ -41,8 +43,25 @@ const getUserData = async (req, res) => {
     }
 }
 
-const updateProfile = async (req, res) => {
-    console.log(req.files);
+const updateProfileImg = async (req, res) => {
+    const cookie = req.body.cookie
+    const user = await getUserInteractor(cookie)
+    const userId = user.id
+    const filename = req.files[0].filename
+    const isUpdated = await updateProfileImgInteractor(userId, filename)
+    res.status(201).json(isUpdated)
 }
 
-export { signUp, login, getUserData, updateProfile }
+const updateProfile = async (req, res) => {
+    const cookie = req.body.cookie
+
+    const data = await updateProfileInteractor(cookie, req.body)
+
+    if (data.updated) {
+        res.status(201).json(data)
+    } else {
+        res.status(409).json(data)
+    }
+}
+
+export { signUp, login, getUserData, updateProfileImg, updateProfile }

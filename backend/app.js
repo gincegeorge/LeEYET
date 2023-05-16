@@ -6,36 +6,27 @@ import connectDb from './database/config.js'
 import { router } from './routes/userRoutes.js'
 import cookieParser from 'cookie-parser'
 
-connectDb()
-dotenv.config()
 const { BACKEND_PORT, FRONTEND_URL } = process.env
+dotenv.config()
+
+connectDb()
 
 const app = express()
 
+app.use(express.static('public'))
+app.use(express.json())
 app.use(morgan('dev'))
 app.use(cookieParser())
-
-
-//server setup
-app.listen(BACKEND_PORT, () => {
-    console.log("server started on port", BACKEND_PORT)
-})
-
-app.use(express.json())
-
 app.use(cors({
     origin: [FRONTEND_URL],
     methods: ["GET", "POST"],
     credentials: true
 }))
 
-app.all('/', (req, res) => {
-    console.log('sdkfjlskdfjskldfjksldjfklsdfjksdjk')
+//server setup
+app.listen(BACKEND_PORT, () => {
+    console.log("server started on port", BACKEND_PORT)
 })
 
-app.get('/', (req, res) => {
-    console.log("foooooooooooooooooooo")
-    res.send("working")
-})
-
+//routes
 app.use('/', router)

@@ -17,9 +17,9 @@ function App() {
     return (
       <>
         <Provider store={store}>
-        <Header />
-        <Outlet />
-        <Footer />
+          <Header />
+          <Outlet />
+          <Footer />
         </Provider>
       </>
     );

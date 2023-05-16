@@ -49,7 +49,9 @@ function Dashboard() {
             <img
               src={
                 userInfo?.profileImg
-                  ? userInfo?.profileImg
+                  ? `${import.meta.env.VITE_BACKEND_URL}uploads/${
+                      userInfo?.profileImg
+                    }`
                   : "/img/placeholder-profile-pic.png"
               }
               alt=""
